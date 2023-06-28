@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import numpy as np
-import pygal
+import pygal 
+from pygal.style import DarkSolarizedStyle
 from math import cos
 
 
@@ -10,18 +11,18 @@ app = Flask(__name__)
 def teste():
     data = request.get_json()
     z = data.get('Z')
-    restricoes = data.get('restricoes')
-     
-    chart = pygal.XY()
+    restricoes = data.get('restricoes')     
+
+
+
+    chart = pygal.XY(style=DarkSolarizedStyle)
     chart.title = f"Gráfico {z}"
-  
-    quantidade_rest= len(restricoes[0])
-
-    for a in restricoes:
-      print(a)
-      return jsonify(a)
-      # chart.add(f'{a}')
-
+    # chart.add(f'{a}')
+    chart.add('Série 1', ([2,6],[4,3]), show_dots=False, fill=True)
+    chart.add('Série 2', ([4,0],[4,6]), show_dots=False,fill=True)
+    chart.add('Série 3', ([0,6],[5,6]), show_dots=False,fill=True)
+    chart.add('Série 4', ([0,9],[6,0]), show_dots=False,fill=True)
+    chart.render_to_file('chart.svg')
     # Render the chart to an SVG file
     # bar_chart.render_to_file('bar_achart.svg')
     return jsonify(z)
