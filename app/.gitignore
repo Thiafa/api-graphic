@@ -1,0 +1,44 @@
+# Arquivos de byte compilados do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ambiente virtual Python
+venv/
+env/
+*.env
+
+# Arquivos de log e dados temporários
+logs/
+*.log
+*.swp
+*.swo
+*.sqlite3
+
+# Arquivos de configuração
+*.ini
+*.cfg
+*.conf
+
+# Pacotes e dependências instalados
+bin/
+build/
+include/
+lib/
+lib64/
+local/
+pip-wheel-metadata/
+dist/
+eggs/
+parts/
+sdist/
+var/
+
+# Outros arquivos e diretórios específicos do projeto
+*.pydevproject
+.idea/
+.vscode/
+*.pyc
+*.egg-info/
+.DS_Store
