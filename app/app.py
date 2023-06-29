@@ -9,25 +9,32 @@ app = Flask(__name__)
 
 @app.route('/api/grafico',  methods=['POST'])
 def teste():
-    data = request.get_json()
-    z = data.get('Z')
+    data = request.get_json()   
+    constrained = data.get('constrained')
+    funcaoZ = data.get('funcaoZ')
+    # print(constrained)
     restricoes = data.get('restricoes')     
+    line_chart = pygal.XY()
+    line_chart.title = 'Expressao'
+    def calcularRaizes(vars,cost,line_chart):
+        aux = list()
+        for num in vars():
+            raiz = num/cost 
+            aux.append(raiz)
+            aux.append(0)
+        contador = (len(vars))
+        print(contador)
+        print(aux)                    
+    
+    for key, value in constrained.items():
+        calcularRaizes(value['vars'],value['cost'],line_chart)
+        # print(value['vars'])
+        # print(value['cost'])
+        # add('Série 2', [[xraizX],[y,raizY] ])
+          
+    line_chart.render_to_file('scatter_chart.svg')
 
-
-
-    chart = pygal.XY(style=DarkSolarizedStyle)
-    chart.title = f"Gráfico {z}"
-    # chart.add(f'{a}')
-    chart.add('Série 1', ([2,6],[4,3]), show_dots=False, fill=True)
-    chart.add('Série 2', ([4,0],[4,6]), show_dots=False,fill=True)
-    chart.add('Série 3', ([0,6],[5,6]), show_dots=False,fill=True)
-    chart.add('Série 4', ([0,9],[6,0]), show_dots=False,fill=True)
-    chart.render_to_file('chart.svg')
-    # Render the chart to an SVG file
-    # bar_chart.render_to_file('bar_achart.svg')
-    return jsonify(z)
-
-
+    return jsonify(constrained)
 
 if __name__ == "__main__":
     app.run(debug=True)
