@@ -17,22 +17,38 @@ def teste():
     line_chart = pygal.XY()
     line_chart.title = 'Expressao'
     def calcularRaizes(vars,cost,line_chart):
-        aux = list()
-        for num in vars():
-            raiz = num/cost 
-            aux.append(raiz)
-            aux.append(0)
-        contador = (len(vars))
-        print(contador)
-        print(aux)                    
+        
+        l_aux = list()
+        
+        i = 0
+        for num in vars:
+            aux = list()
+            if(num != 0):
+                raiz = cost/num
+                # print(f'{raiz} = {cost}/{num}')
+                aux = list()
+                if(i == 0):
+                    aux.append(raiz)
+                    aux.append(0)
+                    print(aux)
+                    l_aux.append(aux)
+                elif(i == 1):
+                    aux.append(0)
+                    aux.append(raiz)
+                    print(aux)
+                    l_aux.append(aux)
+            
+                
+                l_aux.append(aux)
+            line_chart.add(f'Restrição {i}:',l_aux)
+            i+=1
+            print(l_aux)    
     
     for key, value in constrained.items():
         calcularRaizes(value['vars'],value['cost'],line_chart)
-        # print(value['vars'])
-        # print(value['cost'])
-        # add('Série 2', [[xraizX],[y,raizY] ])
-          
-    line_chart.render_to_file('scatter_chart.svg')
+
+    line_chart.render_to_file('function_chart.svg')
+    # line_chart.render_to_file('scatter_chart.svg')
 
     return jsonify(constrained)
 
