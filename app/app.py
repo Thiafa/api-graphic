@@ -21,8 +21,26 @@ def api_graph():
         l_aux = []
         j = 0
         for i, num in enumerate(vars):
+            # print(f'[{i}] Vars {num} {cost}')
             aux = []
-            if num != 0:
+            print(num)
+            if(vars[0] < 0 or vars[1] < 0):
+                if(vars[0]<0):    
+                    raiz=cost/num*-1        
+                    if i == 0:
+                        aux.append(raiz)
+                        aux.append(0)
+                        l_aux.append(aux)
+                    elif i == 1:
+                        aux.append(0)
+                        aux.append(raiz)
+                        l_aux.append(aux)       
+                        line_chart.add(f'Restrição {i}:', l_aux)    
+                elif(vars[1]<0):
+                    print('asd')
+                    line_chart.add(f'Restrição {i}', [(num, 0), (num_aux,num_aux+6)])
+
+            elif num > 0:
                 raiz = cost / num
                 if i == 0:
                     aux.append(raiz)
@@ -32,17 +50,18 @@ def api_graph():
                     aux.append(0)
                     aux.append(raiz)
                     l_aux.append(aux)
-                line_chart.add(f'Restrição {i}:', l_aux)
+                line_chart.add(f'Restrição {i}:', l_aux)               
+           
             else:
                 if(vars.index(0) == 0 ):
                     num_aux=cost/vars[1]
-                    print('--->',num_aux)
-                    line_chart.add('Reta x', [(0, num_aux), (num_aux+4,num_aux)])
+                    # print('--->',num_aux)
+                    line_chart.add(f'Restrição {i}', [(0, num_aux), (num+4,num_aux)])
                 elif(vars.index(0) == 1 ):
                     num_aux=cost/vars[0]
-                    print('--------->',cost)
-                    print('--->',num_aux)
-                    line_chart.add('Reta Paralela ao eixo y', [(num_aux, 0), (num_aux,num_aux+6)])
+                    # print('--------->',cost)
+                    # print('--->',num_aux)
+                    line_chart.add(f'Restrição {i}', [(num_aux, 0), (num_aux,num_aux+6)])
                 
        
 
@@ -50,8 +69,7 @@ def api_graph():
         calcularRaizes(value['vars'], value['cost'], line_chart)
 
     line_chart.render_to_file('function_chart.svg')
-
     return jsonify(constrained)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
