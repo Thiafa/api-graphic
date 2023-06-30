@@ -1,64 +1,57 @@
 from flask import Flask, jsonify, request
-import numpy as np
-import pygal 
+import pygal
 from pygal.style import DarkSolarizedStyle
-from math import cos
-
 
 app = Flask(__name__)
 
-@app.route('/api/grafico',  methods=['POST'])
+@app.route('/api', methods=['GET'])
 def teste():
-    data = request.get_json()   
+    return jsonify('Deu bom')
+
+
+@app.route('/api/grafico', methods=['POST'])
+def api_graph():
+    data = request.get_json()
     constrained = data.get('constrained')
     funcaoZ = data.get('funcaoZ')
-    # print(constrained)
-    restricoes = data.get('restricoes')     
     line_chart = pygal.XY()
     line_chart.title = 'Expressao'
-    def calcularRaizes(vars,cost,line_chart):
-        
-        l_aux = list()
-        
-        i = 0
-        for num in vars:
-            aux = list()
-            if(num != 0):
-                raiz = cost/num
-                # print(f'{raiz} = {cost}/{num}')
-                aux = list()
-                if(i == 0):
+
+    def calcularRaizes(vars, cost, line_chart):
+        l_aux = []
+        j = 0
+        for i, num in enumerate(vars):
+            aux = []
+            if num != 0:
+                raiz = cost / num
+                if i == 0:
                     aux.append(raiz)
                     aux.append(0)
-                    print(aux)
                     l_aux.append(aux)
-                elif(i == 1):
+                elif i == 1:
                     aux.append(0)
                     aux.append(raiz)
-                    print(aux)
                     l_aux.append(aux)
-            
+                line_chart.add(f'Restrição {i}:', l_aux)
+            else:
+                if(vars.index(0) == 0 ):
+                    num_aux=cost/vars[1]
+                    print('--->',num_aux)
+                    line_chart.add('Reta x', [(0, num_aux), (num_aux+4,num_aux)])
+                elif(vars.index(0) == 1 ):
+                    num_aux=cost/vars[0]
+                    print('--------->',cost)
+                    print('--->',num_aux)
+                    line_chart.add('Reta Paralela ao eixo y', [(num_aux, 0), (num_aux,num_aux+6)])
                 
-                l_aux.append(aux)
-            line_chart.add(f'Restrição {i}:',l_aux)
-            i+=1
-            print(l_aux)    
-    
-    for key, value in constrained.items():
-        calcularRaizes(value['vars'],value['cost'],line_chart)
+       
+
+    for value in constrained.values():
+        calcularRaizes(value['vars'], value['cost'], line_chart)
 
     line_chart.render_to_file('function_chart.svg')
-    # line_chart.render_to_file('scatter_chart.svg')
 
     return jsonify(constrained)
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-#Z
-#3x+5x2
-
-#Restricoes
-#x1<=4
-#2x2<=12
-#3x1+2x2<=18
+    app.run()
