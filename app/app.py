@@ -1,8 +1,12 @@
 from flask import Flask, jsonify, request
 import pygal
 from pygal.style import DarkSolarizedStyle
+from flask_cors import CORS
+import aspose.words as aw
+
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/api', methods=['GET'])
 def teste():
@@ -12,6 +16,7 @@ def teste():
 @app.route('/api/grafico', methods=['POST'])
 def api_graph():
     data = request.get_json()
+    # print(data)
     constrained = data.get('constrained')
     funcaoZ = data.get('funcaoZ')
     line_chart = pygal.XY()
@@ -68,8 +73,10 @@ def api_graph():
     for value in constrained.values():
         calcularRaizes(value['vars'], value['cost'], line_chart)
 
-    line_chart.render_to_file('function_chart.svg')
-    return jsonify(constrained)
+    line_chart.render_to_file('../../Simplex/src/assets/function_chart.svg')
+    img = open('function_chart.svg', 'r')
+    return 'Deu tudo certo';
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
