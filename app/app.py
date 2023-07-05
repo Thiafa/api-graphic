@@ -13,70 +13,96 @@ def teste():
 @app.route('/api/grafico', methods=['POST'])
 def api_graph():
     try:
+        # Recebendo os valores
         data = request.get_json()
         constrained = data.get('constrained')
         x_otimo = data.get('xOtimo')
         z_otimo = data.get('zOtimo')
+        f = data.get('f')
+        # print(data)
+        print(constrained)
+        # Iniciando o gráfico XY
         line_chart = pygal.XY()
         line_chart.title = 'Resolução Gráfica do Simplex'
 
-        if x_otimo:
-            x = z_otimo / x_otimo[0]
-            y = z_otimo / x_otimo[1]
-            line_chart.add(f'Z', [[x, 0], [0, y]])
+        aux_z = []
+        for i, num in enumerate(f):
+            if(num < 0):
+                num = num *-1
+            if(i==0):
+                num_aux = z_otimo/num
+                aux_z.append([num_aux, 0])
+            elif(i==1):
+                num_aux = z_otimo/num
+                aux_z.append([0,num_aux])
+        line_chart.add('Ponto Otimo', aux_z)
 
+        if x_otimo:
+            x = x_otimo[0]
+            y = x_otimo[1]
+            line_chart.add(f'Z*', [[x,y]])
+            
+        aux = []
         for value in constrained.values():
             vars = value['vars']
             cost = value['cost']
-            array_constrained = []
+           
             for i, num in enumerate(vars):
-                aux = []
-                if vars[0] < 0 or vars[1] < 0:
-                    if vars[0] < 0:
-                        raiz = cost / num * -1
-                        if i == 0:
-                            aux.append(raiz)
-                            aux.append(0)
-                            array_constrained.append(aux)
-                        elif i == 1:
-                            aux.append(0)
-                            aux.append(raiz)
-                            array_constrained.append(aux)
-                        line_chart.add(f'Restrição {i}:', array_constrained)
-                    elif vars[1] < 0:
-                        num_aux = cost / vars[0]
-                        array_constrained.append((num, 0))
-                        array_constrained.append((num_aux, num_aux + 6))
-                        line_chart.add(f'Restrição {i}', array_constrained)
+               if(i==0):
+                   if(num == 0):
+                        aux.insert(i,0)
+                        # aux.insert(i+1,vars[i]+10)
+                   if(num != 0):
+                        aux.insert(i,cost/num)
+                        # aux.insert(i+1,0)
+                   
+               elif(i==1):
+                    if(num == 0):
+                        aux.insert(i,0)
+                        # aux.insert(i+1,vars[i]+10)
+                    if(num!=0):
+                        aux.insert(i,cost/num)
+                        # aux.insert(i-1,0)
+        def quebrar_em_pares(array):
+            pares = []            
+            for i in range(0, len(array), 2):
+                par = array[i:i+2]
+                pares.append(par)
+            return pares
+                  
+        a = quebrar_em_pares(aux)
+        for i, l in enumerate(a):
+            t = []
+            if(l[0] and l[1] != 0):
+                l.insert(1,0)
+                l.insert(2,0)
+                t = quebrar_em_pares(l)
+                print(t)
+                line_chart.add('Restrição ', t)
+            elif(l[0]==0 and l[1]!=0):
+                print('x',l)
+                l.append(l[1]*2)
+                l.append(l[1])
+                t = quebrar_em_pares(l)
+                print(t)
+                line_chart.add('Restrição ', t)
+            elif(l[1]==0 and l[0]!=0):
+                print('x',l)
+                l.append(l[0])
+                l.append(l[0]*2)
+                t = quebrar_em_pares(l)
+                print(t)
+                line_chart.add('Restrição ', t)
+                
 
-                elif num > 0:
-                    raiz = cost / num
-                    if i == 0:
-                        aux.append(raiz)
-                        aux.append(0)
-                        array_constrained.append(aux)
-                    elif i == 1:
-                        aux.append(0)
-                        aux.append(raiz)
-                        array_constrained.append(aux)
-                    line_chart.add(f'Restrição {i}:', array_constrained)
-
-                else:
-                    if vars.index(0) == 0:
-                        num_aux = cost / vars[1]
-                        array_constrained.append((0, num_aux))
-                        array_constrained.append((num + 6, num_aux))
-                        line_chart.add(f'Restrição {i}', array_constrained)
-                    elif vars.index(0) == 1:
-                        num_aux = cost / vars[0]
-                        array_constrained.append((num_aux, 0))
-                        array_constrained.append((num_aux, num_aux + 6))
-                        line_chart.add(f'Restrição {i}', array_constrained)
-
+        line_chart.render_to_file('../../Simplex/src/assets/function_chart.svg')
         line_chart.render_to_file('function_chart.svg')
+        # img = open('function_chart.svg')
+        # return img
         return jsonify('Imagem gerada com sucesso'), 200
     except Exception as e:
-        return jsonify('Erro no Servidor Interno'), 500
+        print(e)
+        return jsonify('Erro no Servidor Interno',e), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
