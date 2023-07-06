@@ -35,7 +35,7 @@ def api_graph():
             elif(i==1):
                 num_aux = z_otimo/num
                 aux_z.append([0,num_aux])
-        line_chart.add('Ponto Otimo', aux_z)
+        line_chart.add('Z', aux_z)
 
         if x_otimo:
             x = x_otimo[0]
